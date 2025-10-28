@@ -180,10 +180,14 @@ public class InteractiveRunner implements CommandLineRunner {
         System.out.print("Enter hostname: ");
         String hostname = scanner.nextLine().trim();
 
-        System.out.print("Enter GPU load (0-100): ");
+        System.out.print("Enter GPU load (0-100) [above 100 means over: ");
         double gpuLoad;
         try {
             gpuLoad = Double.parseDouble(scanner.nextLine().trim());
+            if (gpuLoad < 0) {
+                System.out.println("GPU load must be a not negative number.");
+                return;
+            }
         } catch (NumberFormatException e) {
             System.out.println("Invalid GPU load value.");
             return;
@@ -236,7 +240,7 @@ public class InteractiveRunner implements CommandLineRunner {
         RenderNode node = nodeOpt.get();
         System.out.println("\nNode to delete:");
         System.out.println("Hostname: " + node.getHostname());
-        System.out.println("Cluster: " + node.getCluster().getName());
+//        System.out.println("Cluster: " + node.getCluster().getName());
 
         System.out.print("\nAre you sure you want to delete this node? (yes/no): ");
         String confirmation = scanner.nextLine().trim().toLowerCase();
