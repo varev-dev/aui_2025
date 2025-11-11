@@ -1,15 +1,13 @@
 package dev.varev.aui.bootstrap;
 
-import dev.varev.aui.model.RenderCluster;
-import dev.varev.aui.model.RenderNode;
+import dev.varev.aui.entity.RenderCluster;
+import dev.varev.aui.entity.RenderNode;
 import dev.varev.aui.service.RenderClusterService;
 import dev.varev.aui.service.RenderNodeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.event.EventListener;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 

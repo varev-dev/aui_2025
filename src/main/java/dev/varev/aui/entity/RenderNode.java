@@ -1,9 +1,8 @@
-package dev.varev.aui.model;
+package dev.varev.aui.entity;
 
 import lombok.*;
 import jakarta.persistence.*;
 import java.io.Serializable;
-import java.util.Objects;
 import java.util.UUID;
 
 

@@ -1,4 +1,4 @@
-package dev.varev.aui.model;
+package dev.varev.aui.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -6,7 +6,6 @@ import lombok.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -30,7 +29,7 @@ public class RenderCluster implements Comparable<RenderCluster>, Serializable {
     @Column(name = "location")
     private String location;
 
-    @OneToMany(mappedBy = "cluster", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "cluster", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default
     private List<RenderNode> nodes = new ArrayList<>();
 

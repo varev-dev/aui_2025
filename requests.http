@@ -1,0 +1,369 @@
+### HPC Render Cluster Management System - REST API Tests
+### Compatible with IntelliJ IDEA HTTP Client and VS Code REST Client
+
+### Variables (update these with actual IDs from responses)
+@baseUrl = http://localhost:8080/api
+@clusterId = 29866b63-b875-41ec-a690-0c5a7657e899
+@nodeId = 95f8e2df-18b8-4244-9aa9-7fb3a92f58b9
+
+########################################
+### CLUSTER OPERATIONS
+########################################
+
+### 1. Get all clusters (200 OK)
+GET {{baseUrl}}/clusters
+Accept: application/json
+
+###
+
+### 2. Get single cluster by ID (200 OK or 404 NOT FOUND)
+GET {{baseUrl}}/clusters/{{clusterId}}
+Accept: application/json
+
+###
+
+### 3. Get non-existent cluster (404 NOT FOUND)
+GET {{baseUrl}}/clusters/00000000-0000-0000-0000-000000000000
+Accept: application/json
+
+###
+
+### 4. Create new cluster (201 CREATED with Location header)
+POST {{baseUrl}}/clusters
+Content-Type: application/json
+
+{
+  "name": "Test Cluster",
+  "location": "Test Data Center - Poznan"
+}
+
+###
+
+### 5. Create another cluster
+POST {{baseUrl}}/clusters
+Content-Type: application/json
+
+{
+  "name": "QA Cluster",
+  "location": "QA Data Center - Wroclaw"
+}
+
+###
+
+### 6. Update existing cluster (200 OK)
+PUT {{baseUrl}}/clusters/{{clusterId}}
+Content-Type: application/json
+
+{
+  "name": "Updated Cluster Name",
+  "location": "Updated Location - Warsaw"
+}
+
+###
+
+### 7. Update non-existent cluster (404 NOT FOUND)
+PUT {{baseUrl}}/clusters/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+
+{
+  "name": "Non-existent Cluster",
+  "location": "Nowhere"
+}
+
+###
+
+### 8. Delete cluster (204 NO CONTENT - cascades to nodes)
+DELETE {{baseUrl}}/clusters/{{clusterId}}
+
+###
+
+### 9. Delete non-existent cluster (404 NOT FOUND)
+DELETE {{baseUrl}}/clusters/00000000-0000-0000-0000-000000000000
+
+###
+
+########################################
+### NODE OPERATIONS - All Nodes
+########################################
+
+### 10. Get all nodes from all clusters (200 OK)
+GET {{baseUrl}}/nodes
+Accept: application/json
+
+###
+
+### 11. Get single node by ID (200 OK or 404 NOT FOUND)
+GET {{baseUrl}}/nodes/{{nodeId}}
+Accept: application/json
+
+###
+
+### 12. Delete node by ID (204 NO CONTENT)
+DELETE {{baseUrl}}/nodes/{{nodeId}}
+
+###
+
+########################################
+### NODE OPERATIONS - By Cluster
+########################################
+
+### 13. Get all nodes from specific cluster (200 OK with empty array if no nodes)
+GET {{baseUrl}}/clusters/{{clusterId}}/nodes
+Accept: application/json
+
+###
+
+### 14. Get nodes from non-existent cluster (404 NOT FOUND)
+GET {{baseUrl}}/clusters/00000000-0000-0000-0000-000000000000/nodes
+Accept: application/json
+
+###
+
+### 15. Get specific node from specific cluster (200 OK)
+GET {{baseUrl}}/clusters/{{clusterId}}/nodes/{{nodeId}}
+Accept: application/json
+
+###
+
+### 16. Create new node in existing cluster (201 CREATED)
+POST {{baseUrl}}/clusters/{{clusterId}}/nodes
+Content-Type: application/json
+
+{
+  "hostname": "test-node-01.example.local",
+  "gpuLoad": 55.5,
+  "temperature": 68
+}
+
+###
+
+### 17. Create another node in same cluster
+POST {{baseUrl}}/clusters/{{clusterId}}/nodes
+Content-Type: application/json
+
+{
+  "hostname": "test-node-02.example.local",
+  "gpuLoad": 72.3,
+  "temperature": 75
+}
+
+###
+
+### 18. Create node in non-existent cluster (404 NOT FOUND)
+POST {{baseUrl}}/clusters/00000000-0000-0000-0000-000000000000/nodes
+Content-Type: application/json
+
+{
+  "hostname": "orphan-node.example.local",
+  "gpuLoad": 50.0,
+  "temperature": 65
+}
+
+###
+
+### 19. Update existing node (200 OK)
+PUT {{baseUrl}}/clusters/{{clusterId}}/nodes/{{nodeId}}
+Content-Type: application/json
+
+{
+  "hostname": "updated-node.example.local",
+  "gpuLoad": 88.9,
+  "temperature": 82
+}
+
+###
+
+### 20. Update node in non-existent cluster (404 NOT FOUND)
+PUT {{baseUrl}}/clusters/00000000-0000-0000-0000-000000000000/nodes/{{nodeId}}
+Content-Type: application/json
+
+{
+  "hostname": "will-not-work.example.local",
+  "gpuLoad": 50.0,
+  "temperature": 65
+}
+
+###
+
+### 21. Update non-existent node (404 NOT FOUND)
+PUT {{baseUrl}}/clusters/{{clusterId}}/nodes/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+
+{
+  "hostname": "non-existent.example.local",
+  "gpuLoad": 50.0,
+  "temperature": 65
+}
+
+###
+
+### 22. Delete node from cluster (204 NO CONTENT)
+DELETE {{baseUrl}}/clusters/{{clusterId}}/nodes/{{nodeId}}
+
+###
+
+### 23. Delete node from non-existent cluster (404 NOT FOUND)
+DELETE {{baseUrl}}/clusters/00000000-0000-0000-0000-000000000000/nodes/{{nodeId}}
+
+###
+
+### 24. Delete non-existent node (404 NOT FOUND)
+DELETE {{baseUrl}}/clusters/{{clusterId}}/nodes/00000000-0000-0000-0000-000000000000
+
+###
+
+########################################
+### COMPLETE WORKFLOW EXAMPLE
+########################################
+
+### Step 1: Create a new cluster and save the ID
+# @name createCluster
+POST {{baseUrl}}/clusters
+Content-Type: application/json
+
+{
+  "name": "Workflow Test Cluster",
+  "location": "Workflow Data Center"
+}
+
+###
+
+### Step 2: Use the cluster ID from previous response to create nodes
+# Note: In IntelliJ IDEA you can use {{createCluster.response.body.id}}
+# For VS Code REST Client, manually copy the ID from response
+POST {{baseUrl}}/clusters/PASTE_CLUSTER_ID_HERE/nodes
+Content-Type: application/json
+
+{
+  "hostname": "workflow-node-01.local",
+  "gpuLoad": 45.0,
+  "temperature": 62
+}
+
+###
+
+### Step 3: Create second node
+POST {{baseUrl}}/clusters/PASTE_CLUSTER_ID_HERE/nodes
+Content-Type: application/json
+
+{
+  "hostname": "workflow-node-02.local",
+  "gpuLoad": 78.5,
+  "temperature": 74
+}
+
+###
+
+### Step 4: Get all nodes from the cluster
+GET {{baseUrl}}/clusters/PASTE_CLUSTER_ID_HERE/nodes
+Accept: application/json
+
+###
+
+### Step 5: Update a node
+PUT {{baseUrl}}/clusters/PASTE_CLUSTER_ID_HERE/nodes/PASTE_NODE_ID_HERE
+Content-Type: application/json
+
+{
+  "hostname": "workflow-node-01-updated.local",
+  "gpuLoad": 92.0,
+  "temperature": 85
+}
+
+###
+
+### Step 6: Delete a node
+DELETE {{baseUrl}}/clusters/PASTE_CLUSTER_ID_HERE/nodes/PASTE_NODE_ID_HERE
+
+###
+
+### Step 7: Get remaining nodes (should have one less)
+GET {{baseUrl}}/clusters/PASTE_CLUSTER_ID_HERE/nodes
+Accept: application/json
+
+###
+
+### Step 8: Delete the entire cluster (cascades to remaining nodes)
+DELETE {{baseUrl}}/clusters/PASTE_CLUSTER_ID_HERE
+
+###
+
+### Step 9: Verify cluster is deleted (should return 404)
+GET {{baseUrl}}/clusters/PASTE_CLUSTER_ID_HERE
+Accept: application/json
+
+###
+
+########################################
+### EDGE CASES AND ERROR SCENARIOS
+########################################
+
+### Empty cluster with no nodes (200 OK with empty array)
+# First create a cluster, then immediately get its nodes without adding any
+POST {{baseUrl}}/clusters
+Content-Type: application/json
+
+{
+  "name": "Empty Cluster",
+  "location": "No Nodes Here"
+}
+
+###
+
+# Then use the cluster ID from response:
+GET {{baseUrl}}/clusters/PASTE_CLUSTER_ID_HERE/nodes
+Accept: application/json
+
+###
+
+### Cascade delete test - delete cluster with multiple nodes
+# 1. Create cluster
+POST {{baseUrl}}/clusters
+Content-Type: application/json
+
+{
+  "name": "Cascade Test Cluster",
+  "location": "Will Be Deleted"
+}
+
+###
+
+# 2. Add multiple nodes (use cluster ID from previous response)
+POST {{baseUrl}}/clusters/PASTE_CLUSTER_ID_HERE/nodes
+Content-Type: application/json
+
+{
+  "hostname": "cascade-node-01.local",
+  "gpuLoad": 50.0,
+  "temperature": 65
+}
+
+###
+
+POST {{baseUrl}}/clusters/PASTE_CLUSTER_ID_HERE/nodes
+Content-Type: application/json
+
+{
+  "hostname": "cascade-node-02.local",
+  "gpuLoad": 60.0,
+  "temperature": 70
+}
+
+###
+
+# 3. Verify nodes exist
+GET {{baseUrl}}/clusters/PASTE_CLUSTER_ID_HERE/nodes
+Accept: application/json
+
+###
+
+# 4. Delete cluster (should cascade delete all nodes)
+DELETE {{baseUrl}}/clusters/PASTE_CLUSTER_ID_HERE
+
+###
+
+# 5. Verify nodes are also deleted
+GET {{baseUrl}}/nodes
+Accept: application/json
+
+###

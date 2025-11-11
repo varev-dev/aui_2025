@@ -1,6 +1,6 @@
 package dev.varev.aui.repository;
 
-import dev.varev.aui.model.RenderCluster;
+import dev.varev.aui.entity.RenderCluster;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,7 +1,7 @@
 package dev.varev.aui.cli;
 
-import dev.varev.aui.model.RenderCluster;
-import dev.varev.aui.model.RenderNode;
+import dev.varev.aui.entity.RenderCluster;
+import dev.varev.aui.entity.RenderNode;
 import dev.varev.aui.service.RenderClusterService;
 import dev.varev.aui.service.RenderNodeService;
 import lombok.RequiredArgsConstructor;

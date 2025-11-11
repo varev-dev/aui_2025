@@ -1,6 +1,5 @@
 package dev.varev.aui.dto;
 
-import dev.varev.aui.model.RenderNode;
 import lombok.*;
 
 import java.util.UUID;

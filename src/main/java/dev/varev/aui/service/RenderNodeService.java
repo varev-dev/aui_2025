@@ -1,7 +1,7 @@
 package dev.varev.aui.service;
 
-import dev.varev.aui.model.RenderCluster;
-import dev.varev.aui.model.RenderNode;
+import dev.varev.aui.entity.RenderCluster;
+import dev.varev.aui.entity.RenderNode;
 import dev.varev.aui.repository.RenderNodeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
