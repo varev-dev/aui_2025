@@ -1,369 +1,257 @@
-### HPC Render Cluster Management System - REST API Tests
-### Compatible with IntelliJ IDEA HTTP Client and VS Code REST Client
+@gatewayUrl = http://localhost:8080/api
+@clusterId = REPLACE_WITH_ACTUAL_CLUSTER_ID
+@nodeId = REPLACE_WITH_ACTUAL_NODE_ID
 
-### Variables (update these with actual IDs from responses)
-@baseUrl = http://localhost:8080/api
-@clusterId = 29866b63-b875-41ec-a690-0c5a7657e899
-@nodeId = 95f8e2df-18b8-4244-9aa9-7fb3a92f58b9
+### CLUSTER OPERATIONS (via Gateway -> Cluster Service :8081)
 
-########################################
-### CLUSTER OPERATIONS
-########################################
-
-### 1. Get all clusters (200 OK)
-GET {{baseUrl}}/clusters
+### 1. Get all clusters
+GET {{gatewayUrl}}/clusters
 Accept: application/json
 
 ###
 
-### 2. Get single cluster by ID (200 OK or 404 NOT FOUND)
-GET {{baseUrl}}/clusters/{{clusterId}}
+### 2. Get single cluster
+GET {{gatewayUrl}}/clusters/{{clusterId}}
 Accept: application/json
 
 ###
 
-### 3. Get non-existent cluster (404 NOT FOUND)
-GET {{baseUrl}}/clusters/00000000-0000-0000-0000-000000000000
-Accept: application/json
-
-###
-
-### 4. Create new cluster (201 CREATED with Location header)
-POST {{baseUrl}}/clusters
+### 3. Create new cluster (will trigger event to Node Service)
+POST {{gatewayUrl}}/clusters
 Content-Type: application/json
 
 {
-  "name": "Test Cluster",
-  "location": "Test Data Center - Poznan"
+  "name": "Gateway Test Cluster",
+  "location": "Test Data Center via Gateway"
 }
 
 ###
 
-### 5. Create another cluster
-POST {{baseUrl}}/clusters
+### 4. Update cluster (will trigger event to Node Service)
+PUT {{gatewayUrl}}/clusters/{{clusterId}}
 Content-Type: application/json
 
 {
-  "name": "QA Cluster",
-  "location": "QA Data Center - Wroclaw"
+  "name": "Updated via Gateway",
+  "location": "Updated Location via Gateway"
 }
 
 ###
 
-### 6. Update existing cluster (200 OK)
-PUT {{baseUrl}}/clusters/{{clusterId}}
-Content-Type: application/json
-
-{
-  "name": "Updated Cluster Name",
-  "location": "Updated Location - Warsaw"
-}
-
-###
-
-### 7. Update non-existent cluster (404 NOT FOUND)
-PUT {{baseUrl}}/clusters/00000000-0000-0000-0000-000000000000
-Content-Type: application/json
-
-{
-  "name": "Non-existent Cluster",
-  "location": "Nowhere"
-}
-
-###
-
-### 8. Delete cluster (204 NO CONTENT - cascades to nodes)
-DELETE {{baseUrl}}/clusters/{{clusterId}}
-
-###
-
-### 9. Delete non-existent cluster (404 NOT FOUND)
-DELETE {{baseUrl}}/clusters/00000000-0000-0000-0000-000000000000
+### 5. Delete cluster (will trigger event to Node Service - cascades nodes)
+DELETE {{gatewayUrl}}/clusters/{{clusterId}}
 
 ###
 
 ########################################
-### NODE OPERATIONS - All Nodes
+### NODE OPERATIONS - All Nodes (via Gateway -> Node Service :8082)
 ########################################
 
-### 10. Get all nodes from all clusters (200 OK)
-GET {{baseUrl}}/nodes
+### 6. Get all nodes
+GET {{gatewayUrl}}/nodes
 Accept: application/json
 
 ###
 
-### 11. Get single node by ID (200 OK or 404 NOT FOUND)
-GET {{baseUrl}}/nodes/{{nodeId}}
+### 7. Get single node
+GET {{gatewayUrl}}/nodes/{{nodeId}}
 Accept: application/json
 
 ###
 
-### 12. Delete node by ID (204 NO CONTENT)
-DELETE {{baseUrl}}/nodes/{{nodeId}}
-
-###
-
-########################################
-### NODE OPERATIONS - By Cluster
-########################################
-
-### 13. Get all nodes from specific cluster (200 OK with empty array if no nodes)
-GET {{baseUrl}}/clusters/{{clusterId}}/nodes
-Accept: application/json
-
-###
-
-### 14. Get nodes from non-existent cluster (404 NOT FOUND)
-GET {{baseUrl}}/clusters/00000000-0000-0000-0000-000000000000/nodes
-Accept: application/json
-
-###
-
-### 15. Get specific node from specific cluster (200 OK)
-GET {{baseUrl}}/clusters/{{clusterId}}/nodes/{{nodeId}}
-Accept: application/json
-
-###
-
-### 16. Create new node in existing cluster (201 CREATED)
-POST {{baseUrl}}/clusters/{{clusterId}}/nodes
-Content-Type: application/json
-
-{
-  "hostname": "test-node-01.example.local",
-  "gpuLoad": 55.5,
-  "temperature": 68
-}
-
-###
-
-### 17. Create another node in same cluster
-POST {{baseUrl}}/clusters/{{clusterId}}/nodes
-Content-Type: application/json
-
-{
-  "hostname": "test-node-02.example.local",
-  "gpuLoad": 72.3,
-  "temperature": 75
-}
-
-###
-
-### 18. Create node in non-existent cluster (404 NOT FOUND)
-POST {{baseUrl}}/clusters/00000000-0000-0000-0000-000000000000/nodes
-Content-Type: application/json
-
-{
-  "hostname": "orphan-node.example.local",
-  "gpuLoad": 50.0,
-  "temperature": 65
-}
-
-###
-
-### 19. Update existing node (200 OK)
-PUT {{baseUrl}}/clusters/{{clusterId}}/nodes/{{nodeId}}
-Content-Type: application/json
-
-{
-  "hostname": "updated-node.example.local",
-  "gpuLoad": 88.9,
-  "temperature": 82
-}
-
-###
-
-### 20. Update node in non-existent cluster (404 NOT FOUND)
-PUT {{baseUrl}}/clusters/00000000-0000-0000-0000-000000000000/nodes/{{nodeId}}
-Content-Type: application/json
-
-{
-  "hostname": "will-not-work.example.local",
-  "gpuLoad": 50.0,
-  "temperature": 65
-}
-
-###
-
-### 21. Update non-existent node (404 NOT FOUND)
-PUT {{baseUrl}}/clusters/{{clusterId}}/nodes/00000000-0000-0000-0000-000000000000
-Content-Type: application/json
-
-{
-  "hostname": "non-existent.example.local",
-  "gpuLoad": 50.0,
-  "temperature": 65
-}
-
-###
-
-### 22. Delete node from cluster (204 NO CONTENT)
-DELETE {{baseUrl}}/clusters/{{clusterId}}/nodes/{{nodeId}}
-
-###
-
-### 23. Delete node from non-existent cluster (404 NOT FOUND)
-DELETE {{baseUrl}}/clusters/00000000-0000-0000-0000-000000000000/nodes/{{nodeId}}
-
-###
-
-### 24. Delete non-existent node (404 NOT FOUND)
-DELETE {{baseUrl}}/clusters/{{clusterId}}/nodes/00000000-0000-0000-0000-000000000000
+### 8. Delete node by ID
+DELETE {{gatewayUrl}}/nodes/{{nodeId}}
 
 ###
 
 ########################################
-### COMPLETE WORKFLOW EXAMPLE
+### NODE OPERATIONS - By Cluster (via Gateway -> Node Service :8082)
 ########################################
 
-### Step 1: Create a new cluster and save the ID
-# @name createCluster
-POST {{baseUrl}}/clusters
-Content-Type: application/json
-
-{
-  "name": "Workflow Test Cluster",
-  "location": "Workflow Data Center"
-}
-
-###
-
-### Step 2: Use the cluster ID from previous response to create nodes
-# Note: In IntelliJ IDEA you can use {{createCluster.response.body.id}}
-# For VS Code REST Client, manually copy the ID from response
-POST {{baseUrl}}/clusters/PASTE_CLUSTER_ID_HERE/nodes
-Content-Type: application/json
-
-{
-  "hostname": "workflow-node-01.local",
-  "gpuLoad": 45.0,
-  "temperature": 62
-}
-
-###
-
-### Step 3: Create second node
-POST {{baseUrl}}/clusters/PASTE_CLUSTER_ID_HERE/nodes
-Content-Type: application/json
-
-{
-  "hostname": "workflow-node-02.local",
-  "gpuLoad": 78.5,
-  "temperature": 74
-}
-
-###
-
-### Step 4: Get all nodes from the cluster
-GET {{baseUrl}}/clusters/PASTE_CLUSTER_ID_HERE/nodes
+### 9. Get all nodes from cluster
+GET {{gatewayUrl}}/clusters/{{clusterId}}/nodes
 Accept: application/json
 
 ###
 
-### Step 5: Update a node
-PUT {{baseUrl}}/clusters/PASTE_CLUSTER_ID_HERE/nodes/PASTE_NODE_ID_HERE
+### 10. Get specific node from cluster
+GET {{gatewayUrl}}/clusters/{{clusterId}}/nodes/{{nodeId}}
+Accept: application/json
+
+###
+
+### 11. Create node in cluster
+POST {{gatewayUrl}}/clusters/{{clusterId}}/nodes
 Content-Type: application/json
 
 {
-  "hostname": "workflow-node-01-updated.local",
-  "gpuLoad": 92.0,
+  "hostname": "gateway-test-node.local",
+  "gpuLoad": 65.5,
+  "temperature": 72
+}
+
+###
+
+### 12. Update node
+PUT {{gatewayUrl}}/clusters/{{clusterId}}/nodes/{{nodeId}}
+Content-Type: application/json
+
+{
+  "hostname": "updated-via-gateway.local",
+  "gpuLoad": 88.0,
   "temperature": 85
 }
 
 ###
 
-### Step 6: Delete a node
-DELETE {{baseUrl}}/clusters/PASTE_CLUSTER_ID_HERE/nodes/PASTE_NODE_ID_HERE
-
-###
-
-### Step 7: Get remaining nodes (should have one less)
-GET {{baseUrl}}/clusters/PASTE_CLUSTER_ID_HERE/nodes
-Accept: application/json
-
-###
-
-### Step 8: Delete the entire cluster (cascades to remaining nodes)
-DELETE {{baseUrl}}/clusters/PASTE_CLUSTER_ID_HERE
-
-###
-
-### Step 9: Verify cluster is deleted (should return 404)
-GET {{baseUrl}}/clusters/PASTE_CLUSTER_ID_HERE
-Accept: application/json
+### 13. Delete node from cluster
+DELETE {{gatewayUrl}}/clusters/{{clusterId}}/nodes/{{nodeId}}
 
 ###
 
 ########################################
-### EDGE CASES AND ERROR SCENARIOS
+### COMPLETE WORKFLOW - Event Communication Test
 ########################################
 
-### Empty cluster with no nodes (200 OK with empty array)
-# First create a cluster, then immediately get its nodes without adding any
-POST {{baseUrl}}/clusters
+### Step 1: Create cluster in Cluster Service
+# @name createCluster
+POST {{gatewayUrl}}/clusters
 Content-Type: application/json
 
 {
-  "name": "Empty Cluster",
-  "location": "No Nodes Here"
+  "name": "Event Test Cluster",
+  "location": "Event Communication Test"
 }
 
 ###
 
-# Then use the cluster ID from response:
-GET {{baseUrl}}/clusters/PASTE_CLUSTER_ID_HERE/nodes
+### Step 2: Verify cluster exists in Cluster Service
+GET {{gatewayUrl}}/clusters
 Accept: application/json
 
 ###
 
-### Cascade delete test - delete cluster with multiple nodes
-# 1. Create cluster
-POST {{baseUrl}}/clusters
-Content-Type: application/json
-
-{
-  "name": "Cascade Test Cluster",
-  "location": "Will Be Deleted"
-}
+### Step 3: Check if cluster reference was created in Node Service (empty nodes)
+GET {{gatewayUrl}}/clusters/PASTE_CLUSTER_ID_HERE/nodes
+Accept: application/json
 
 ###
 
-# 2. Add multiple nodes (use cluster ID from previous response)
-POST {{baseUrl}}/clusters/PASTE_CLUSTER_ID_HERE/nodes
+### Step 4: Add nodes to the cluster
+POST {{gatewayUrl}}/clusters/PASTE_CLUSTER_ID_HERE/nodes
 Content-Type: application/json
 
 {
-  "hostname": "cascade-node-01.local",
+  "hostname": "event-test-node-01.local",
   "gpuLoad": 50.0,
   "temperature": 65
 }
 
 ###
 
-POST {{baseUrl}}/clusters/PASTE_CLUSTER_ID_HERE/nodes
+POST {{gatewayUrl}}/clusters/PASTE_CLUSTER_ID_HERE/nodes
 Content-Type: application/json
 
 {
-  "hostname": "cascade-node-02.local",
-  "gpuLoad": 60.0,
-  "temperature": 70
+  "hostname": "event-test-node-02.local",
+  "gpuLoad": 75.0,
+  "temperature": 78
 }
 
 ###
 
-# 3. Verify nodes exist
-GET {{baseUrl}}/clusters/PASTE_CLUSTER_ID_HERE/nodes
+### Step 5: Verify nodes were created
+GET {{gatewayUrl}}/clusters/PASTE_CLUSTER_ID_HERE/nodes
 Accept: application/json
 
 ###
 
-# 4. Delete cluster (should cascade delete all nodes)
-DELETE {{baseUrl}}/clusters/PASTE_CLUSTER_ID_HERE
+### Step 6: Update cluster (tests CLUSTER_UPDATED event)
+PUT {{gatewayUrl}}/clusters/PASTE_CLUSTER_ID_HERE
+Content-Type: application/json
+
+{
+  "name": "Event Test Cluster UPDATED",
+  "location": "Updated Location"
+}
 
 ###
 
-# 5. Verify nodes are also deleted
-GET {{baseUrl}}/nodes
+### Step 7: Verify cluster reference was updated in Node Service
+GET {{gatewayUrl}}/nodes
+Accept: application/json
+
+###
+
+### Step 8: Delete cluster (tests CLUSTER_DELETED event - cascades to nodes)
+DELETE {{gatewayUrl}}/clusters/PASTE_CLUSTER_ID_HERE
+
+###
+
+### Step 9: Verify all nodes were deleted from Node Service
+GET {{gatewayUrl}}/nodes
+Accept: application/json
+
+###
+
+########################################
+### DIRECT SERVICE ACCESS (for debugging)
+########################################
+
+### Access Cluster Service directly (bypass gateway)
+GET http://localhost:8081/api/clusters
+Accept: application/json
+
+###
+
+### Access Node Service directly (bypass gateway)
+GET http://localhost:8082/api/nodes
+Accept: application/json
+
+###
+
+### Check H2 Console - Cluster Service
+# http://localhost:8081/h2-console
+# JDBC URL: jdbc:h2:mem:clusterdb
+
+###
+
+### Check H2 Console - Node Service
+# http://localhost:8082/h2-console
+# JDBC URL: jdbc:h2:mem:nodedb
+
+########################################
+### TESTING EVENT COMMUNICATION
+########################################
+
+### Scenario: Create cluster and verify event propagation
+# 1. Create cluster via Cluster Service
+POST http://localhost:8081/api/clusters
+Content-Type: application/json
+
+{
+  "name": "Direct Event Test",
+  "location": "Direct Call"
+}
+
+###
+
+# 2. Check logs in Node Service - should show event received
+# 3. Check if cluster reference exists in Node Service
+GET http://localhost:8082/api/clusters/PASTE_CLUSTER_ID_HERE/nodes
+Accept: application/json
+
+###
+
+### Scenario: Delete cluster and verify cascade delete
+# 1. Create cluster with nodes first
+# 2. Delete cluster via Cluster Service
+DELETE http://localhost:8081/api/clusters/PASTE_CLUSTER_ID_HERE
+
+###
+
+# 3. Verify nodes were deleted in Node Service
+GET http://localhost:8082/api/nodes
 Accept: application/json
 
 ###
