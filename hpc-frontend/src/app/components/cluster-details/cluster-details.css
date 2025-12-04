@@ -1,0 +1,189 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.loading, .error {
+  text-align: center;
+  padding: 40px;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.error {
+  background: #fee;
+  color: #c33;
+}
+
+.cluster-header {
+  margin-bottom: 20px;
+}
+
+.cluster-info {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 30px;
+}
+
+.cluster-info-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #4CAF50;
+}
+
+.cluster-info-header h1 {
+  margin: 0;
+  color: #333;
+}
+
+.cluster-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.label {
+  font-weight: 500;
+  color: #666;
+  font-size: 14px;
+}
+
+.value {
+  font-size: 16px;
+  color: #333;
+}
+
+.nodes-section {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-header h2 {
+  margin: 0;
+  color: #333;
+}
+
+.empty {
+  text-align: center;
+  padding: 40px;
+  background: #f9f9f9;
+  border-radius: 4px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background: #2196F3;
+  color: white;
+}
+
+th, td {
+  padding: 15px;
+  text-align: left;
+}
+
+tbody tr {
+  border-bottom: 1px solid #eee;
+}
+
+tbody tr:hover {
+  background: #f9f9f9;
+}
+
+.node-hostname {
+  cursor: pointer;
+  color: #2196F3;
+  font-weight: 500;
+}
+
+.node-hostname:hover {
+  text-decoration: underline;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.btn-back {
+  background: #757575;
+  color: white;
+}
+
+.btn-back:hover {
+  background: #616161;
+}
+
+.btn-primary {
+  background: #4CAF50;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #45a049;
+}
+
+.btn-secondary {
+  background: #9E9E9E;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #757575;
+}
+
+.btn-info {
+  background: #2196F3;
+  color: white;
+}
+
+.btn-info:hover {
+  background: #0b7dda;
+}
+
+.btn-danger {
+  background: #f44336;
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #da190b;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 13px;
+}

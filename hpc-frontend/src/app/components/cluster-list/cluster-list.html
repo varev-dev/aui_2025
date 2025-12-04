@@ -1,0 +1,55 @@
+<div class="container">
+  <div class="header">
+    <h1>Render Clusters</h1>
+    <button class="btn btn-primary" (click)="addNewCluster()">
+      + Add New Cluster
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    Loading clusters...
+  </div>
+
+  <div *ngIf="error" class="error">
+    {{ error }}
+    <button (click)="loadClusters()">Retry</button>
+  </div>
+
+  <div *ngIf="!loading && !error && clusters.length === 0" class="empty">
+    <p>No clusters found.</p>
+    <button class="btn btn-primary" (click)="addNewCluster()">
+      Create your first cluster
+    </button>
+  </div>
+
+  <div *ngIf="!loading && !error && clusters.length > 0" class="cluster-list">
+    <table>
+      <thead>
+        <tr>
+          <th>Cluster Name</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let cluster of clusters">
+          <td>
+            <span class="cluster-name" (click)="viewDetails(cluster.id)">
+              {{ cluster.name }}
+            </span>
+          </td>
+          <td class="actions">
+            <button class="btn btn-sm btn-info" (click)="viewDetails(cluster.id)">
+              View Details
+            </button>
+            <button class="btn btn-sm btn-secondary" (click)="editCluster(cluster.id)">
+              Edit
+            </button>
+            <button class="btn btn-sm btn-danger" (click)="deleteCluster(cluster.id, cluster.name)">
+              Delete
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

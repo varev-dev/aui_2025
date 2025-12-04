@@ -1,0 +1,73 @@
+<div class="container">
+  <div class="form-header">
+    <h1>{{ isEditMode ? 'Edit Render Node' : 'Add New Render Node' }}</h1>
+  </div>
+
+  <div *ngIf="loading && isEditMode" class="loading">
+    Loading node data...
+  </div>
+
+  <div *ngIf="error" class="error">
+    {{ error }}
+  </div>
+
+  <form [formGroup]="nodeForm" (ngSubmit)="onSubmit()" *ngIf="!loading || !isEditMode">
+    <div class="form-group">
+      <label for="hostname">Hostname *</label>
+      <input 
+        type="text" 
+        id="hostname" 
+        formControlName="hostname"
+        [class.invalid]="isFieldInvalid('hostname')"
+        placeholder="e.g., render-node-01.local"
+      >
+      <div class="error-message" *ngIf="isFieldInvalid('hostname')">
+        {{ getErrorMessage('hostname') }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="gpuLoad">GPU Load (%) *</label>
+      <input 
+        type="number" 
+        id="gpuLoad" 
+        formControlName="gpuLoad"
+        [class.invalid]="isFieldInvalid('gpuLoad')"
+        placeholder="0-100"
+        min="0"
+        max="100"
+        step="0.1"
+      >
+      <div class="error-message" *ngIf="isFieldInvalid('gpuLoad')">
+        {{ getErrorMessage('gpuLoad') }}
+      </div>
+      <small class="help-text">GPU utilization percentage (0-100)</small>
+    </div>
+
+    <div class="form-group">
+      <label for="temperature">Temperature (°C) *</label>
+      <input 
+        type="number" 
+        id="temperature" 
+        formControlName="temperature"
+        [class.invalid]="isFieldInvalid('temperature')"
+        placeholder="0-150"
+        min="0"
+        max="150"
+      >
+      <div class="error-message" *ngIf="isFieldInvalid('temperature')">
+        {{ getErrorMessage('temperature') }}
+      </div>
+      <small class="help-text">GPU temperature in degrees Celsius</small>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary" [disabled]="loading">
+        {{ loading ? 'Saving...' : (isEditMode ? 'Update Node' : 'Create Node') }}
+      </button>
+      <button type="button" class="btn btn-secondary" (click)="cancel()" [disabled]="loading">
+        Cancel
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,90 @@
+<div class="container">
+  <div *ngIf="loading" class="loading">
+    Loading cluster details...
+  </div>
+
+  <div *ngIf="error" class="error">
+    {{ error }}
+  </div>
+
+  <div *ngIf="!loading && cluster">
+    <!-- Cluster Details Section -->
+    <div class="cluster-header">
+      <button class="btn btn-back" (click)="backToList()">
+        ← Back to Clusters
+      </button>
+    </div>
+
+    <div class="cluster-info">
+      <div class="cluster-info-header">
+        <h1>{{ cluster.name }}</h1>
+        <button class="btn btn-secondary" (click)="editCluster()">
+          Edit Cluster
+        </button>
+      </div>
+      
+      <div class="cluster-details">
+        <div class="detail-item">
+          <span class="label">Cluster ID:</span>
+          <span class="value">{{ cluster.id }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Location:</span>
+          <span class="value">{{ cluster.location }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Total Nodes:</span>
+          <span class="value">{{ nodes.length }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nodes Section -->
+    <div class="nodes-section">
+      <div class="section-header">
+        <h2>Render Nodes</h2>
+        <button class="btn btn-primary" (click)="addNewNode()">
+          + Add New Node
+        </button>
+      </div>
+
+      <div *ngIf="nodes.length === 0" class="empty">
+        <p>No nodes in this cluster yet.</p>
+        <button class="btn btn-primary" (click)="addNewNode()">
+          Add first node
+        </button>
+      </div>
+
+      <div *ngIf="nodes.length > 0" class="nodes-list">
+        <table>
+          <thead>
+            <tr>
+              <th>Hostname</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let node of nodes">
+              <td>
+                <span class="node-hostname" (click)="viewNodeDetails(node.id)">
+                  {{ node.hostname }}
+                </span>
+              </td>
+              <td class="actions">
+                <button class="btn btn-sm btn-info" (click)="viewNodeDetails(node.id)">
+                  View Details
+                </button>
+                <button class="btn btn-sm btn-secondary" (click)="editNode(node.id)">
+                  Edit
+                </button>
+                <button class="btn btn-sm btn-danger" (click)="deleteNode(node.id, node.hostname)">
+                  Delete
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

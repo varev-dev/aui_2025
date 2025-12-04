@@ -1,0 +1,112 @@
+<div class="container">
+  <div *ngIf="loading" class="loading">
+    Loading node details...
+  </div>
+
+  <div *ngIf="error" class="error">
+    {{ error }}
+    <button (click)="loadNodeDetails()">Retry</button>
+  </div>
+
+  <div *ngIf="!loading && node">
+    <div class="node-header">
+      <button class="btn btn-back" (click)="backToCluster()">
+        ← Back to Cluster
+      </button>
+    </div>
+
+    <div class="node-info">
+      <div class="node-info-header">
+        <h1>{{ node.hostname }}</h1>
+        <div class="header-actions">
+          <button class="btn btn-secondary" (click)="editNode()">
+            Edit Node
+          </button>
+          <button class="btn btn-danger" (click)="deleteNode()">
+            Delete Node
+          </button>
+        </div>
+      </div>
+
+      <div class="node-details">
+        <div class="detail-card">
+          <h3>Basic Information</h3>
+          <div class="detail-item">
+            <span class="label">Node ID:</span>
+            <span class="value">{{ node.id }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Hostname:</span>
+            <span class="value">{{ node.hostname }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Cluster:</span>
+            <span class="value cluster-link" (click)="backToCluster()">
+              {{ node.cluster.name }}
+            </span>
+          </div>
+        </div>
+
+        <div class="detail-card">
+          <h3>Performance Metrics</h3>
+          <div class="detail-item">
+            <span class="label">GPU Load:</span>
+            <span class="value">
+              <span class="metric" [class]="'status-' + getLoadStatus(node.gpuLoad)">
+                {{ node.gpuLoad }}%
+              </span>
+            </span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Temperature:</span>
+            <span class="value">
+              <span class="metric" [class]="'status-' + getTemperatureStatus(node.temperature)">
+                {{ node.temperature }}°C
+              </span>
+            </span>
+          </div>
+        </div>
+
+        <div class="detail-card status-card">
+          <h3>Status</h3>
+          <div class="status-indicators">
+            <div class="status-indicator">
+              <div class="indicator-header">
+                <span class="indicator-label">GPU Load Status</span>
+                <span class="indicator-badge" [class]="'badge-' + getLoadStatus(node.gpuLoad)">
+                  {{ getLoadStatus(node.gpuLoad).toUpperCase() }}
+                </span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" 
+                     [style.width.%]="node.gpuLoad"
+                     [class]="'fill-' + getLoadStatus(node.gpuLoad)">
+                </div>
+              </div>
+            </div>
+
+            <div class="status-indicator">
+              <div class="indicator-header">
+                <span class="indicator-label">Temperature Status</span>
+                <span class="indicator-badge" [class]="'badge-' + getTemperatureStatus(node.temperature)">
+                  {{ getTemperatureStatus(node.temperature).toUpperCase() }}
+                </span>
+              </div>
+              <div class="status-message" [class]="'message-' + getTemperatureStatus(node.temperature)">
+                <span *ngIf="getTemperatureStatus(node.temperature) === 'high'">
+                  ⚠️ High temperature detected. Monitor closely.
+                </span>
+                <span *ngIf="getTemperatureStatus(node.temperature) === 'medium'">
+                  ⚡ Temperature elevated. Normal operating range.
+                </span>
+                <span *ngIf="getTemperatureStatus(node.temperature) === 'normal'">
+                  ✓ Temperature within normal limits.
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
