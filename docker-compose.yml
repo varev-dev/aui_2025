@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  cluster-service:
+    build:
+      context: ./cluster-service
+      dockerfile: Dockerfile
+    container_name: hpc-cluster-service
+    ports:
+      - "8081:8081"
+    environment:
+      - SERVER_PORT=8081
+      - NODE_SERVICE_URL=http://node-service:8082
+      - SPRING_DATASOURCE_URL=jdbc:h2:mem:clusterdb
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop
+    networks:
+      - hpc-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8081/api/clusters"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  node-service:
+    build:
+      context: ./node-service
+      dockerfile: Dockerfile
+    container_name: hpc-node-service
+    ports:
+      - "8082:8082"
+    environment:
+      - SERVER_PORT=8082
+      - SPRING_DATASOURCE_URL=jdbc:h2:mem:nodedb
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop
+    networks:
+      - hpc-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8082/api/nodes"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  gateway-service:
+    build:
+      context: ./gateway-service
+      dockerfile: Dockerfile
+    container_name: hpc-gateway-service
+    ports:
+      - "8080:8080"
+    environment:
+      - SERVER_PORT=8080
+      - CLUSTER_SERVICE_URL=http://cluster-service:8081
+      - NODE_SERVICE_URL=http://node-service:8082
+    depends_on:
+      cluster-service:
+        condition: service_healthy
+      node-service:
+        condition: service_healthy
+    networks:
+      - hpc-network
+
+  frontend:
+    build:
+      context: ./hpc-frontend
+      dockerfile: Dockerfile
+    container_name: hpc-frontend
+    ports:
+      - "80:80"
+    environment:
+      - GATEWAY_URL=http://gateway-service:8080
+    depends_on:
+      - gateway-service
+    networks:
+      - hpc-network
+
+networks:
+  hpc-network:
+    driver: bridge
