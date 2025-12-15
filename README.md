@@ -1,4 +1,26 @@
-# AUI 2025
+# HPC Cluster Manager (AUI 2025)
+
+![CI Pipeline](https://github.com/varev-dev/aui_2025/actions/workflows/ci-pipeline.yml/badge.svg)
+
+A microservices-based application for managing High Performance Computing (HPC) clusters and nodes. The system allows users to create, view, and manage computing resources through a modern web interface.
+
+## 🛠️ Tech Stack
+
+**Backend:**
+* **Java 21** & **Spring Boot 3**
+* **Spring Cloud Gateway** (API Gateway)
+* **Spring Data JPA** (Hibernate)
+* **H2** (Dev) / **PostgreSQL** (Prod)
+
+**Frontend:**
+* **Angular 18+** (Standalone Components)
+* **Nginx** (Reverse Proxy & Static Server)
+* **Bootstrap / Tailwind** (jeśli używasz CSS frameworka)
+
+**DevOps & Infrastructure:**
+* **Docker** & **Docker Compose**
+* **GitHub Actions** (CI Pipeline)
+* **Maven** & **NPM**
 
 ## Project Deployment
 
