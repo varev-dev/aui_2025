@@ -51,5 +51,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build Docker Images
-        run: docker-compose build
+      - name: Build Docker Images (Development variant)
+        run: docker compose build
+
+      - name: Build Docker Images (Postgres variant)
+        run: docker compose -f docker-compose-postgres.yml build
