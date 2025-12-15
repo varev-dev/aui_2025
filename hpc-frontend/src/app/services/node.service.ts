@@ -7,7 +7,7 @@ import { Node, NodeList, CreateUpdateNode } from '../models/node.model';
   providedIn: 'root'
 })
 export class NodeService {
-  private apiUrl = 'http://localhost:8080/api';
+  private apiUrl = 'http://localhost/api';
 
   constructor(private http: HttpClient) {}
 

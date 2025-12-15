@@ -7,7 +7,7 @@ import { Cluster, ClusterList, CreateUpdateCluster } from '../models/cluster.mod
   providedIn: 'root'
 })
 export class ClusterService {
-  private apiUrl = 'http://localhost:8080/api/clusters';
+  private apiUrl = 'http://localhost/api/clusters';
 
   constructor(private http: HttpClient) {}
 
