@@ -5,22 +5,22 @@ spring:
     gateway:
       routes:
         - id: node-service-cluster-nodes
-          uri: http://localhost:8082
+          uri: ${NODE_SERVICE_URL:http://localhost:8082}
           predicates:
             - Path=/api/clusters/*/nodes/**
 
         - id: cluster-service
-          uri: http://localhost:8081
+          uri: ${CLUSTER_SERVICE_URL:http://localhost:8081}
           predicates:
             - Path=/api/clusters/**
 
         - id: node-service-all-nodes
-          uri: http://localhost:8082
+          uri: ${NODE_SERVICE_URL:http://localhost:8082}
           predicates:
             - Path=/api/nodes/**
 
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
 
 logging:
   level:
