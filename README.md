@@ -4,7 +4,7 @@
 
 A microservices-based application for managing High Performance Computing (HPC) clusters and nodes. The system allows users to create, view, and manage computing resources through a modern web interface.
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 **Backend:**
 * **Java 21** & **Spring Boot 3**
@@ -15,7 +15,6 @@ A microservices-based application for managing High Performance Computing (HPC) 
 **Frontend:**
 * **Angular 18+** (Standalone Components)
 * **Nginx** (Reverse Proxy & Static Server)
-* **Bootstrap / Tailwind** (jeśli używasz CSS frameworka)
 
 **DevOps & Infrastructure:**
 * **Docker** & **Docker Compose**
