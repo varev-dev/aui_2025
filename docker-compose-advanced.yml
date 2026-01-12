@@ -1,0 +1,227 @@
+version: '3.8'
+
+services:
+  cluster-db:
+    image: postgres:15-alpine
+    container_name: hpc-cluster-db
+    environment:
+      - POSTGRES_DB=clusterdb
+      - POSTGRES_USER=clusteruser
+      - POSTGRES_PASSWORD=clusterpass
+    ports:
+      - "5432:5432"
+    volumes:
+      - cluster-db-data:/var/lib/postgresql/data
+    networks:
+      - hpc-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U clusteruser -d clusterdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  node-db:
+    image: postgres:15-alpine
+    container_name: hpc-node-db
+    environment:
+      - POSTGRES_DB=nodedb
+      - POSTGRES_USER=nodeuser
+      - POSTGRES_PASSWORD=nodepass
+    ports:
+      - "5433:5432"
+    volumes:
+      - node-db-data:/var/lib/postgresql/data
+    networks:
+      - hpc-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nodeuser -d nodedb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  eureka-server:
+    build:
+      context: ./eureka-server
+      dockerfile: Dockerfile
+    container_name: hpc-eureka-server
+    ports:
+      - "8761:8761"
+    environment:
+      - SERVER_PORT=8761
+      - EUREKA_HOSTNAME=eureka-server
+    networks:
+      - hpc-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8761/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  config-server:
+    build:
+      context: ./config-server
+      dockerfile: Dockerfile
+    container_name: hpc-config-server
+    ports:
+      - "8888:8888"
+    environment:
+      - SERVER_PORT=8888
+      - SPRING_PROFILES_ACTIVE=native
+    networks:
+      - hpc-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8888/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  cluster-service:
+    build:
+      context: ./cluster-service
+      dockerfile: Dockerfile
+    container_name: hpc-cluster-service
+    ports:
+      - "8081:8081"
+    environment:
+      - SERVER_PORT=8081
+      - CONFIG_SERVER_URL=http://config-server:8888
+      - EUREKA_URL=http://eureka-server:8761/eureka/
+      - INSTANCE_ID=cluster-service-1
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://cluster-db:5432/clusterdb
+      - SPRING_DATASOURCE_USERNAME=clusteruser
+      - SPRING_DATASOURCE_PASSWORD=clusterpass
+    depends_on:
+      cluster-db:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+    networks:
+      - hpc-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8081/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  node-service-1:
+    build:
+      context: ./node-service
+      dockerfile: Dockerfile
+    container_name: hpc-node-service-1
+    ports:
+      - "8082:8082"
+    environment:
+      - SERVER_PORT=8082
+      - CONFIG_SERVER_URL=http://config-server:8888
+      - EUREKA_URL=http://eureka-server:8761/eureka/
+      - INSTANCE_ID=node-service-1
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://node-db:5432/nodedb
+      - SPRING_DATASOURCE_USERNAME=nodeuser
+      - SPRING_DATASOURCE_PASSWORD=nodepass
+    depends_on:
+      node-db:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+    networks:
+      - hpc-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8082/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  node-service-2:
+    build:
+      context: ./node-service
+      dockerfile: Dockerfile
+    container_name: hpc-node-service-2
+    ports:
+      - "8083:8082"
+    environment:
+      - SERVER_PORT=8082
+      - CONFIG_SERVER_URL=http://config-server:8888
+      - EUREKA_URL=http://eureka-server:8761/eureka/
+      - INSTANCE_ID=node-service-2
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://node-db:5432/nodedb
+      - SPRING_DATASOURCE_USERNAME=nodeuser
+      - SPRING_DATASOURCE_PASSWORD=nodepass
+    depends_on:
+      node-db:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+    networks:
+      - hpc-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8082/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  gateway-service:
+    build:
+      context: ./gateway-service
+      dockerfile: Dockerfile
+    container_name: hpc-gateway-service
+    ports:
+      - "8080:8080"
+    environment:
+      - SERVER_PORT=8080
+      - CONFIG_SERVER_URL=http://config-server:8888
+      - EUREKA_URL=http://eureka-server:8761/eureka/
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      cluster-service:
+        condition: service_healthy
+      node-service-1:
+        condition: service_healthy
+      node-service-2:
+        condition: service_healthy
+    networks:
+      - hpc-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  frontend:
+    build:
+      context: ./hpc-frontend
+      dockerfile: Dockerfile
+    container_name: hpc-frontend
+    ports:
+      - "80:80"
+    environment:
+      - GATEWAY_URL=http://gateway-service:8080
+    depends_on:
+      gateway-service:
+        condition: service_healthy
+    networks:
+      - hpc-network
+
+networks:
+  hpc-network:
+    driver: bridge
+
+volumes:
+  cluster-db-data:
+    driver: local
+  node-db-data:
+    driver: local
