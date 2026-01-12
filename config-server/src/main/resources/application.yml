@@ -1,0 +1,20 @@
+server:
+  port: ${SERVER_PORT:8888}
+
+spring:
+  application:
+    name: config-server
+  profiles:
+    active: native
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+    config:
+      server:
+        native:
+          search-locations: classpath:/config
+      git:
+        uri: https://github.com/spring-cloud-samples/config-repo  # Required but not used
+        default-label: main

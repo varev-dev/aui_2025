@@ -1,0 +1,34 @@
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: cluster-service
+          uri: lb://cluster-service
+          predicates:
+            - Path=/api/clusters,/api/clusters/**
+        
+        - id: node-service-cluster-nodes
+          uri: lb://node-service
+          predicates:
+            - Path=/api/clusters/*/nodes,/api/clusters/*/nodes/**
+        
+        - id: node-service-all-nodes
+          uri: lb://node-service
+          predicates:
+            - Path=/api/nodes,/api/nodes/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://eureka-server:8761/eureka/}
+    register-with-eureka: true
+    fetch-registry: true
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.cloud.loadbalancer: DEBUG
